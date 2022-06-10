@@ -22,7 +22,7 @@ export class PlacesService {
     ),
     new Place(
       'p3',
-      'Yamamizuku Ryokan',
+      'Yamamizuku Ryokan Japan',
       'Well, Kumamoto is well known for their hot springs',
       'https://www.img-ikyu.com/contents/dg/guide/acc1/00001801/img/a_ss_01_191010.jpg?auto=compress,format&fit=crop&lossless=0&w=1920&h=600&q=30',
       432
