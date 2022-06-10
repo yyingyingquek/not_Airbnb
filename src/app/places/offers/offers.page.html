@@ -1,5 +1,9 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
     <ion-title>My Listed Places</ion-title>
     <ion-buttons slot="primary">
       <ion-button routerLink="/places/tabs/offers/new">
@@ -22,7 +26,7 @@
               <ion-img [src]="offerElement.imageUrl"></ion-img>
             </ion-thumbnail>
             <ion-label>
-              <h1>{{offerElement.title}}</h1>
+              <h2>{{offerElement.title}}</h2>
             </ion-label>
           </ion-item>
         </ion-list>

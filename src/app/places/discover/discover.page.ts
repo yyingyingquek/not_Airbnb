@@ -8,13 +8,19 @@ import { PlacesService } from '../places.service';
   styleUrls: ['./discover.page.scss'],
 })
 export class DiscoverPage implements OnInit {
-  loadedPlaces: Place[]
+  loadedPlaces: Place[];
 
-  constructor(private placesService: PlacesService) { }
+  constructor(
+    private placesService: PlacesService
+  ) {}
 
   ngOnInit() {
-    this.loadedPlaces = this.placesService.places
-    console.log(this.loadedPlaces)
+    this.loadedPlaces = this.placesService.places;
+    console.log(this.loadedPlaces);
   }
 
+  // approach for opening side drawer programmatically
+  // onOpenMenu() {
+  //   this.menuController.toggle();
+  // }
 }
