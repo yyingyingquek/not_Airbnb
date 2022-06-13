@@ -9,6 +9,11 @@
 </ion-header>
 
 <ion-content>
+  <ion-segment (ionChange)="onFilterUpdate($event)">
+    <ion-segment-button value="all-listing">All Listings</ion-segment-button>
+    <ion-segment-button value="book-listing">Book Listings</ion-segment-button>
+  </ion-segment>
+
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
@@ -36,6 +41,7 @@
     </ion-row>
     <ion-row>
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+        <!-- <cdk-virtual-scroll-viewport itemSize="56" minBufferPx="900" maxBufferPx="1350">  -->
         <ion-list>
           <ion-item
             *ngFor="let placeElement of loadedPlaces.slice(1)"
@@ -51,6 +57,7 @@
             </ion-label>
           </ion-item>
         </ion-list>
+        <!-- </cdk-virtual-scroll-viewport> -->
       </ion-col>
     </ion-row>
   </ion-grid>
