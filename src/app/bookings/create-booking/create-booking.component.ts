@@ -51,16 +51,25 @@ export class CreateBookingComponent implements OnInit {
   }
 
   onBookPlace() {
+    if (!this.form.valid) {
+      return;
+    }
+
     this.modalController.dismiss(
       {
-        message: 'message',
+        message: 'booked!',
+        bookingData: {
+          firstName: this.form.value['first-name'],
+          lastName: this.form.value['last-name'],
+          guestNumber: this.form.value['guest-num'],
+          startDate: this.form.value['dateFrom'],
+          endDate: this.form.value['dateTo'],
+        },
         dismissed: true,
       },
       'confirm'
     );
   }
-
-  onSubmitBookingForm() {}
 
   datesValid() {
     const startDate = new Date(this.form.value['dateFrom']);

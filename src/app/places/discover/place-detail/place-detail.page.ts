@@ -49,12 +49,12 @@ export class PlaceDetailPage implements OnInit {
               this.openBookingModal('select');
             },
           },
-          {
-            text: 'Random Date',
-            handler: () => {
-              this.openBookingModal('random');
-            },
-          },
+          // {
+          //   text: 'Random Date',
+          //   handler: () => {
+          //     this.openBookingModal('random');
+          //   },
+          // },
           {
             text: 'Cancel',
             role: 'cancel',
@@ -83,7 +83,7 @@ export class PlaceDetailPage implements OnInit {
       .then((resultData) => {
         console.log(resultData.data, resultData.role);
         if (resultData.role === 'confirm') {
-          console.log('BOOK THIS PLACE!');
+          console.log('BOOKED!');
         }
       });
   }
