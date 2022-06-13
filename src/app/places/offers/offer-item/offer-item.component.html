@@ -6,14 +6,14 @@
     <h2>{{ offer.title }}</h2>
     <div class="offer-details">
       <ion-icon name="calendar-number-outline" color="primary"></ion-icon>
-      <ion-text class="space-left">{{ getDummyDate() | date }}</ion-text>
+      <ion-text class="space-left">{{ offer.availableFrom | date }}</ion-text>
       <span>-</span>
       <ion-icon
         name="calendar-number-outline"
         color="primary"
         class="space-left"
       ></ion-icon>
-      <ion-text>{{ getDummyDate() | date }}</ion-text>
+      <ion-text>{{ offer.availableTo | date }}</ion-text>
     </div>
   </ion-label>
 </ion-item>

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SegmentChangeEventDetail } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 
 import { Place } from '../place.model';
 import { PlacesService } from '../places.service';
@@ -9,13 +10,16 @@ import { PlacesService } from '../places.service';
   templateUrl: './discover.page.html',
   styleUrls: ['./discover.page.scss'],
 })
-export class DiscoverPage implements OnInit {
+export class DiscoverPage implements OnInit, OnDestroy {
   loadedPlaces: Place[];
+  private placesSubscription: Subscription;
 
   constructor(private placesService: PlacesService) {}
 
   ngOnInit() {
-    this.loadedPlaces = this.placesService.places;
+    this.placesSubscription = this.placesService.places.subscribe((places) => {
+      this.loadedPlaces = places;
+    });
     console.log(this.loadedPlaces);
   }
 
@@ -26,5 +30,11 @@ export class DiscoverPage implements OnInit {
 
   onFilterUpdate(event: any) {
     console.log(event.detail);
+  }
+
+  ngOnDestroy(): void {
+    if (this.placesSubscription) {
+      this.placesSubscription.unsubscribe();
+    }
   }
 }
