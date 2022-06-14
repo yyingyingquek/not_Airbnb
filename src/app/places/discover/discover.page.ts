@@ -13,6 +13,7 @@ import { PlacesService } from '../places.service';
 export class DiscoverPage implements OnInit, OnDestroy {
   loadedPlaces: Place[];
   filterPlaces: Place[];
+  isLoading: boolean = false;
   private filter = 'all-listing';
   private placesSubscription: Subscription;
 
@@ -30,6 +31,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
     this.placesSubscription = this.placesService.places.subscribe((places) => {
       this.loadedPlaces = places;
       this.onFilterUpdate(this.filter);
+    });
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.placesService.fetchListings().subscribe(() => {
+      this.isLoading = false;
     });
   }
 

@@ -54,13 +54,6 @@ const routes: Routes = [
                 (m) => m.EditOfferPageRoutingModule
               ),
           },
-          {
-            path: ':placeId',
-            loadChildren: () =>
-              import(
-                './offers/offer-bookings/offer-bookings-routing.module'
-              ).then((m) => m.OfferBookingsPageRoutingModule),
-          },
         ],
       },
     ],
