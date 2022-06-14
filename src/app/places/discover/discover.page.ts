@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SegmentChangeEventDetail } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 
 import { Place } from '../place.model';
 import { PlacesService } from '../places.service';
@@ -12,13 +12,19 @@ import { PlacesService } from '../places.service';
 })
 export class DiscoverPage implements OnInit, OnDestroy {
   loadedPlaces: Place[];
+  filterPlaces: Place[];
+  private filter = 'all-listing';
   private placesSubscription: Subscription;
 
-  constructor(private placesService: PlacesService) {}
+  constructor(
+    private placesService: PlacesService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.placesSubscription = this.placesService.places.subscribe((places) => {
       this.loadedPlaces = places;
+      this.filterPlaces = this.loadedPlaces;
     });
     console.log(this.loadedPlaces);
   }
@@ -29,7 +35,15 @@ export class DiscoverPage implements OnInit, OnDestroy {
   // }
 
   onFilterUpdate(event: any) {
-    console.log(event.detail);
+    console.log(event.detail.value);
+    if (event.detail.value === 'all-listing') {
+      this.filterPlaces = this.loadedPlaces;
+    } else {
+      // idk why this is not working
+      this.filterPlaces = this.loadedPlaces.filter((place) => {
+        place.userId !== this.authService.userId;
+      });
+    }
   }
 
   ngOnDestroy(): void {
