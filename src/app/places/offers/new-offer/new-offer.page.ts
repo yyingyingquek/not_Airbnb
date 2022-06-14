@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { PlaceLocation } from 'src/app/shared/location.model';
 import { PlacesService } from '../../places.service';
 
 @Component({
@@ -40,7 +41,14 @@ export class NewOfferPage implements OnInit {
         updateOn: 'blur',
         validators: [Validators.required],
       }),
+      location: new FormControl(null, {
+        validators: [Validators.required],
+      }),
     });
+  }
+
+  onLocationPicked(location: PlaceLocation) {
+    this.listingForm.patchValue({ location: location });
   }
 
   onCreateListing() {
@@ -60,7 +68,8 @@ export class NewOfferPage implements OnInit {
             this.listingForm.value.description,
             +this.listingForm.value.price,
             this.listingForm.value.dateFrom,
-            this.listingForm.value.dateTo
+            this.listingForm.value.dateTo,
+            this.listingForm.value.location
           )
           .subscribe(() => {
             loadingElement.dismiss();

@@ -19,8 +19,28 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col size-sm="6" offset-sm="3" class="ion-text-center ion-padding">
+      <ion-col
+        size-sm="6"
+        offset-sm="3"
+        class="ion-text-center"
+        class="ion-padding"
+      >
         <p>{{place.description}}</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-sm="6" offset-sm="3" class="ion-padding-horizontal">
+        <p>Listing Address: <br /><span>{{place.location.address}}</span></p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-sm="6" offset-sm="3" class="ion-padding">
+        <ion-img
+          role="button"
+          class="location-img"
+          [src]="place.location.staticMapImageUrl"
+          (click)="onShowMap()"
+        ></ion-img>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="isBookable">

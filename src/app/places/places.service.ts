@@ -4,6 +4,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { take, map, tap, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '../auth/auth.service';
+import { PlaceLocation } from '../shared/location.model';
 import { Place } from './place.model';
 
 interface PlaceData {
@@ -14,6 +15,7 @@ interface PlaceData {
   price: number;
   title: string;
   userId: string;
+  location: PlaceLocation;
 }
 
 @Injectable({
@@ -78,7 +80,8 @@ export class PlacesService {
                   responseData[key].price,
                   new Date(responseData[key].availableFrom),
                   new Date(responseData[key].availableTo),
-                  responseData[key].userId
+                  responseData[key].userId,
+                  responseData[key].location
                 )
               );
             }
@@ -107,7 +110,8 @@ export class PlacesService {
             placeData.price,
             new Date(placeData.availableFrom),
             new Date(placeData.availableTo),
-            placeData.userId
+            placeData.userId,
+            placeData.location
           );
         })
       );
@@ -125,7 +129,8 @@ export class PlacesService {
     description: string,
     price: number,
     availableFrom: Date,
-    availableTo: Date
+    availableTo: Date,
+    location: PlaceLocation
   ) {
     let generatedId: string;
     const newPlace = new Place(
@@ -136,7 +141,8 @@ export class PlacesService {
       price,
       availableFrom,
       availableTo,
-      this.authService.userId
+      this.authService.userId,
+      location
     );
     return this.http
       .post<{ name: string }>(
@@ -194,7 +200,8 @@ export class PlacesService {
           oldPlace.price,
           oldPlace.availableFrom,
           oldPlace.availableTo,
-          oldPlace.userId
+          oldPlace.userId,
+          oldPlace.location
         );
         return this.http.put(
           `https://not-airbnb-default-rtdb.asia-southeast1.firebasedatabase.app/offered-listings/${placeId}.json`,

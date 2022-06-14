@@ -8,6 +8,7 @@ import {
   NavController,
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { MapModalComponent } from '../../../shared/map-modal/map-modal.component';
 import { AuthService } from '../../../auth/auth.service';
 import { BookingsService } from '../../../bookings/bookings.service';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
@@ -90,7 +91,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
             },
           },
           // {
-          //   text: 'Random Date',
+          //   text: 'Random Date', - not working
           //   handler: () => {
           //     this.openBookingModal('random');
           //   },
@@ -146,6 +147,23 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
             });
         }
       });
+  }
+
+  onShowMap() {
+    this.modalController
+      .create({
+        component: MapModalComponent,
+        componentProps: {
+          center: {
+            lat: this.place.location.lat,
+            lng: this.place.location.lng,
+          },
+          selectable: false,
+          closeButtonText: 'Close',
+          title: this.place.location.address,
+        },
+      })
+      .then((modalElement) => modalElement.present());
   }
 
   ngOnDestroy(): void {
