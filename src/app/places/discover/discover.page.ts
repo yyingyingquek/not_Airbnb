@@ -22,11 +22,15 @@ export class DiscoverPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    // this.placesSubscription = this.placesService.places.subscribe((places) => {
+    //   this.loadedPlaces = places;
+    //   this.filterPlaces = this.loadedPlaces;
+    // });
+    // console.log(this.filterPlaces);
     this.placesSubscription = this.placesService.places.subscribe((places) => {
       this.loadedPlaces = places;
-      this.filterPlaces = this.loadedPlaces;
+      this.onFilterUpdate(this.filter);
     });
-    console.log(this.loadedPlaces);
   }
 
   // approach for opening side drawer programmatically
@@ -34,16 +38,23 @@ export class DiscoverPage implements OnInit, OnDestroy {
   //   this.menuController.toggle();
   // }
 
-  onFilterUpdate(event: any) {
-    console.log(event.detail.value);
-    if (event.detail.value === 'all-listing') {
-      this.filterPlaces = this.loadedPlaces;
-    } else {
-      // idk why this is not working
-      this.filterPlaces = this.loadedPlaces.filter((place) => {
-        place.userId !== this.authService.userId;
-      });
-    }
+  onFilterUpdate(filter: string) {
+    // console.log(event.detail.value);
+    // if (event.detail.value === 'all-listing') {
+    //   this.filterPlaces = this.loadedPlaces;
+    //   console.log(this.filterPlaces);
+    // } else if (event.detail.value === 'bookable-listing') {
+    //   // idk why this is not working
+    //   this.filterPlaces = this.loadedPlaces.filter((placeArr) => {
+    //     placeArr.userId !== this.authService.userId;
+    //   });
+    // }
+
+    // somehow this works with screaming errors in HTML
+    const isShown = (place: any) =>
+      filter === 'all-listing' || place.userId !== this.authService.userId;
+    this.filterPlaces = this.loadedPlaces.filter(isShown);
+    this.filter = filter;
   }
 
   ngOnDestroy(): void {
