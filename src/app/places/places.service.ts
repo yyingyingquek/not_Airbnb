@@ -36,6 +36,7 @@ export class PlacesService {
         'https://not-airbnb-default-rtdb.asia-southeast1.firebasedatabase.app/offered-listings.json'
       )
       .pipe(
+        take(1),
         map((responseData) => {
           const placesArr = [];
           for (const key in responseData) {
@@ -70,6 +71,7 @@ export class PlacesService {
         `https://not-airbnb-default-rtdb.asia-southeast1.firebasedatabase.app/offered-listings/${id}.json`
       )
       .pipe(
+        take(1),
         map((placeData) => {
           return new Place(
             id,
