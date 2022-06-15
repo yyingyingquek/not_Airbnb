@@ -134,39 +134,45 @@ export class PlacesService {
     availableFrom: Date,
     availableTo: Date,
     location: PlaceLocation,
-    imageUrl: string,
+    imageUrl: string
   ) {
     let generatedId: string;
-    const newPlace = new Place(
-      Math.random().toString(),
-      title,
-      description,
-      imageUrl,
-      price,
-      availableFrom,
-      availableTo,
-      this.authService.userId,
-      location
-    );
-    return this.http
-      .post<{ name: string }>(
-        'https://not-airbnb-default-rtdb.asia-southeast1.firebasedatabase.app/offered-listings.json',
-        {
-          ...newPlace,
-          id: null,
+    let newPlace: Place;
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap((userId) => {
+        if (!userId) {
+          throw new Error('No User found');
         }
-      )
-      .pipe(
-        switchMap((responseData) => {
-          generatedId = responseData.name;
-          return this.places;
-        }),
-        take(1),
-        tap((places) => {
-          newPlace.id = generatedId;
-          this._places.next(places.concat(newPlace));
-        })
-      );
+        newPlace = new Place(
+          Math.random().toString(),
+          title,
+          description,
+          imageUrl,
+          price,
+          availableFrom,
+          availableTo,
+          userId,
+          location
+        );
+        return this.http.post<{ name: string }>(
+          'https://not-airbnb-default-rtdb.asia-southeast1.firebasedatabase.app/offered-listings.json',
+          {
+            ...newPlace,
+            id: null,
+          }
+        );
+      }),
+      switchMap((responseData) => {
+        generatedId = responseData.name;
+        return this.places;
+      }),
+      take(1),
+      tap((places) => {
+        newPlace.id = generatedId;
+        this._places.next(places.concat(newPlace));
+      })
+    );
   }
 
   updateListing(placeId: string, title: string, description: string) {

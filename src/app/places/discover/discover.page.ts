@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/auth/auth.service';
+import { take } from 'rxjs/operators';
+import { AuthService } from '../../auth/auth.service';
 
 import { Place } from '../place.model';
 import { PlacesService } from '../places.service';
@@ -58,11 +59,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
     //   });
     // }
 
-    // somehow this works with screaming errors in HTML
-    const isShown = (place: any) =>
-      filter === 'all-listing' || place.userId !== this.authService.userId;
-    this.filterPlaces = this.loadedPlaces.filter(isShown);
-    this.filter = filter;
+    this.authService.userId.pipe(take(1)).subscribe((userId) => {
+      // somehow this works with screaming errors in HTML
+      const isShown = (place: any) =>
+        filter === 'all-listing' || place.userId !== this.authService.userId;
+      this.filterPlaces = this.loadedPlaces.filter(isShown);
+      this.filter = filter;
+    });
   }
 
   ngOnDestroy(): void {
