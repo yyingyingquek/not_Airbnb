@@ -14,7 +14,7 @@ import { BookingsService } from '../../../bookings/bookings.service';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-place-detail',
@@ -50,6 +50,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
       let fetchUserId: string;
       this.authService.userId
         .pipe(
+          take(1),
           switchMap((userId) => {
             if (!userId) {
               throw new Error('Found no user!');

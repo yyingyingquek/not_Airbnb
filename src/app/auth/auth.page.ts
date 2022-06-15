@@ -44,7 +44,7 @@ export class AuthPage implements OnInit {
             this.isLoading = false;
             loadingElement.dismiss();
             // this.router.navigate(['/places/tabs/discover']);
-            // this.router.navigateByUrl('/places/tabs/discover');
+            this.router.navigateByUrl('/places/tabs/discover');
           },
           (errorResponse) => {
             // console.log(errorResponse.error.error.message)
@@ -80,6 +80,7 @@ export class AuthPage implements OnInit {
 
     this.authenticate(email, password);
     // this.router.navigate(['/places/tabs/discover']);
+    form.reset();
   }
 
   private showAlertError(message: string) {
