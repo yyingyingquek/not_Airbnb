@@ -115,13 +115,16 @@ export class PlacesService {
           );
         })
       );
+  }
 
-    // return this.places.pipe(
-    //   take(1),
-    //   map((places) => {
-    //     return { ...places.find((place) => place.id === id) };
-    //   })
-    // );
+  uploadImage(image: File) {
+    const uploadData = new FormData();
+    uploadData.append('image', image);
+
+    return this.http.post<{ imageUrl: string; imagePath: string }>(
+      'https://us-central1-not-airbnb.cloudfunctions.net/storeImage',
+      uploadData
+    );
   }
 
   addListing(
@@ -130,14 +133,15 @@ export class PlacesService {
     price: number,
     availableFrom: Date,
     availableTo: Date,
-    location: PlaceLocation
+    location: PlaceLocation,
+    imageUrl: string,
   ) {
     let generatedId: string;
     const newPlace = new Place(
       Math.random().toString(),
       title,
       description,
-      'https://www.img-ikyu.com/contents/dg/guide/acc1/00001801/img/a_ss_01_191010.jpg?auto=compress,format&fit=crop&lossless=0&w=1920&h=600&q=30',
+      imageUrl,
       price,
       availableFrom,
       availableTo,
@@ -163,15 +167,6 @@ export class PlacesService {
           this._places.next(places.concat(newPlace));
         })
       );
-    // return this.places.pipe(
-    //   take(1),
-    //   delay(1000),
-    //   tap((places) => {
-    //     setTimeout(() => {
-    //       this._places.next(places.concat(newPlace));
-    //     }, 1000);
-    //   })
-    // );
   }
 
   updateListing(placeId: string, title: string, description: string) {
@@ -212,27 +207,5 @@ export class PlacesService {
         this._places.next(updatedPlaces);
       })
     );
-
-    // return this.places.pipe(
-    //   take(1),
-    //   tap((placesArr) => {
-    //     const updatedPlaceIndex = placesArr.findIndex(
-    //       (place) => place.id === placeId
-    //     );
-    //     const updatedPlaces = [...placesArr];
-    //     const oldPlace = updatedPlaces[updatedPlaceIndex];
-    //     updatedPlaces[updatedPlaceIndex] = new Place(
-    //       oldPlace.id,
-    //       title,
-    //       description,
-    //       oldPlace.imageUrl,
-    //       oldPlace.price,
-    //       oldPlace.availableFrom,
-    //       oldPlace.availableTo,
-    //       oldPlace.userId
-    //     );
-    //     this._places.next(updatedPlaces);
-    //   })
-    // );
   }
 }
