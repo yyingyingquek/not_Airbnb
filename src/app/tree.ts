@@ -3,8 +3,40 @@ export class BinarySearchTreeNode<T> {
   leftNode?: BinarySearchTreeNode<T>;
   rightNode?: BinarySearchTreeNode<T>;
 
+  height: number = 1;
+
   constructor(data: T) {
     this.data = data;
+  }
+
+  get leftHeight(): number {
+    if (this.leftNode == null) {
+      return 0;
+    }
+    return this.leftNode.height;
+  }
+
+  get rightHeight(): number {
+    if (this.rightNode == null) {
+      return 0;
+    }
+    return this.rightNode.height;
+  }
+
+  // getHeight(node: BinarySearchTreeNode<T>) {
+  //   return node == null ? -1 : node.height;
+  // }
+
+  // getHeight() {
+  //   return this.height - 1;
+  // }
+
+  balanceFactor() {
+    return this.leftHeight - this.rightHeight;
+  }
+
+  updateHeight() {
+    this.height = 1 + Math.max(this.leftHeight, this.rightHeight);
   }
 }
 
@@ -12,184 +44,177 @@ export class BinarySearchTree<T> {
   root?: BinarySearchTreeNode<T>;
   comparator: (a: T, b: T) => number;
 
-  constructor(comparator: (a: T, b: T) => number) {
-    this.comparator = comparator;
+  // constructor(comparator: (a: T, b: T) => number) {
+  //   this.comparator = comparator;
+  // }
+
+  constructor() {}
+
+  selfBalancingTree(node: BinarySearchTreeNode<T>, key: T) {
+    // if -1: more on right so do left rotate
+    // if 0: do nothing
+    // if 1: more on left so do right rotate
+
+    const balanceFactorOfNode = node.balanceFactor();
+
+    // 1. left left case - do right rotate
+    if (balanceFactorOfNode > 1 && key < node.leftNode.data) {
+      return this.rightRotate(node);
+    }
+    // 2. right right case - do left rotate
+    if (balanceFactorOfNode < -1 && key > node.rightNode.data) {
+      return this.leftRotate(node);
+    }
+    // 3. left right case - do left then right rotate
+    if (balanceFactorOfNode > 1 && key > node.leftNode.data) {
+      node.leftNode = this.leftRotate(node.leftNode);
+      return this.rightRotate(node);
+    }
+    // 4. right left case - do right then left rotate
+    if (balanceFactorOfNode < -1 && key < node.rightNode.data) {
+      node.rightNode = this.rightRotate(node.rightNode);
+      return this.leftRotate(node);
+    }
+    return node;
   }
 
-  insert(data: T): BinarySearchTreeNode<T> | undefined {
-    //to implement
-    const newNode = new BinarySearchTreeNode(data);
+  leftRotate(node: BinarySearchTreeNode<T>) {
+    let y = node.rightNode; // save right subtree of node passed in
+    let yLeftChild = y.leftNode; // save left child of the node
+    y.leftNode = node; // swap the left child
+    node.rightNode = yLeftChild; // set the node at the right to be the yLeftChild
 
-    // set newNode as the root if tree is empty
-    if (this.root == null) {
+    node.updateHeight();
+    y.updateHeight();
+
+    return y;
+  }
+
+  rightRotate(node: BinarySearchTreeNode<T>) {
+    let y = node.leftNode; // save the left subtree of node passed in
+    let yRightChild = y.rightNode; // save the right child of the node
+    y.rightNode = node; // swap the right child
+    node.leftNode = yRightChild; // set the node at the left to be yRightChild
+
+    node.updateHeight();
+    y.updateHeight();
+
+    return y;
+  }
+
+  insert(data: T, key: T): BinarySearchTreeNode<T> | undefined {
+    const newNode = new BinarySearchTreeNode(data);
+    if (!this.root) {
       this.root = newNode;
-      return;
-    } else {
-      // need to find the right place to insert the node
+      return newNode;
+    }
+
+    if (this.root) {
       let currentNode = this.root;
       let searchingForPosition = true;
+      currentNode.updateHeight();
+
+      let searchForDuplicate = this.search(data);
+      if (searchForDuplicate) {
+        searchingForPosition = false;
+        throw new Error('data already exists');
+      }
 
       while (searchingForPosition) {
-        if (currentNode.data == newNode.data) {
-          // in binary search tree, there should be no duplicated value
-          searchingForPosition = false;
-          return;
-        } else if (currentNode.data > newNode.data) {
-          // check if there is existing left child node. if no, set currentNode.left as newNode
-          // if there is a node, continue to move down
+        if (currentNode.data > newNode.data) {
           if (currentNode.leftNode == null) {
             currentNode.leftNode = newNode;
+            currentNode.updateHeight();
             searchingForPosition = false;
-            return;
+            this.selfBalancingTree(currentNode, key);
+            return this.selfBalancingTree(newNode, key);
           } else {
             currentNode = currentNode.leftNode;
+            currentNode.updateHeight();
+            this.selfBalancingTree(currentNode, key);
           }
-        } else if (currentNode.data < newNode.data) {
-          // check if there is existing right child node. if no, set currentNode.right as newNode
-          // if there is a node, continue to move down
+        } else if (currentNode.data < data) {
           if (currentNode.rightNode == null) {
             currentNode.rightNode = newNode;
+            currentNode.updateHeight();
             searchingForPosition = false;
-            return;
+            this.selfBalancingTree(currentNode, key);
+            return this.selfBalancingTree(newNode, key);
           } else {
             currentNode = currentNode.rightNode;
+            currentNode.updateHeight();
+            this.selfBalancingTree(currentNode, key);
           }
         }
       }
     }
+
+    // if (this.root == undefined || null) {
+    //   return new BinarySearchTreeNode(key);
+    // }
+
+    // if (key < data.data) {
+    //   data.leftNode = this.insert(data, key);
+    // } else if (key > data.data) {
+    //   data.rightNode = this.insert(data, key);
+    // } else {
+    //   return data;
+    // }
+    return this.selfBalancingTree(newNode, key);
   }
 
   search(data: T): BinarySearchTreeNode<T> | undefined {
-    //to implement
+    if (!this.root) {
+      return null;
+    }
 
-    // create a queue to queue up the nodes
-    let queue = new Array(new BinarySearchTreeNode(data));
+    let currentNode = this.root;
 
-    // create an array to store all the nodes that already visited
-    let visitedNodes = new Array(new BinarySearchTreeNode(data));
-
-    // the idea is to do the following while the queue is not empty
-    while (queue.length !== 0) {
-      // 1. remove the first element from the queue
-      let current = queue.shift();
-      console.log(current);
-
-      // 2. add the node to the visited array
-      visitedNodes.push(current);
-      // visitedNodes.push(current.data) - how come got error?
-
-      // 3. if node has left child, add to the queue to be visited
-      if (current.leftNode !== null) {
-        queue.push(current.leftNode);
+    while (currentNode) {
+      if (currentNode.data == data) {
+        return currentNode;
       }
 
-      // 4. if node has right child, add to the queue to be visited
-      if (current.rightNode !== null) {
-        queue.push(current.rightNode);
+      if (currentNode.data > data) {
+        if (!currentNode.leftNode) {
+          return;
+        }
+        currentNode = currentNode.leftNode;
+      } else {
+        if (!currentNode.rightNode) {
+          return;
+        }
+        currentNode = currentNode.rightNode;
       }
     }
 
-    // 5. return array
-    console.log(visitedNodes);
-    return;
-    // return visitedNodes - how come cannot return the array
+    return currentNode;
   }
 
-  // left - root - right
   inOrderTraversal(node: BinarySearchTreeNode<T> | undefined): void {
-    let stack = new Array<BinarySearchTreeNode<T>>();
-    let inOrderTraversalArray = new Array<T>();
-    stack.push(node);
-
-    while (stack.length > 0) {
-      // node = stack.pop();
-
-      // if node has left child, add to stack
-      if (node.leftNode !== null) {
-        stack.push(node.leftNode);
-      }
-
-      inOrderTraversalArray.push(node.data);
-
-      if (node.rightNode !== null) {
-        stack.push(node.rightNode);
-      }
-    }
-
     if (node) {
       this.inOrderTraversal(node.leftNode);
       console.log(node.data);
       this.inOrderTraversal(node.rightNode);
     }
     return;
-    // return inOrderTraversalArray;
   }
 
-  // root - left - right
   preOrderTraversal(node: BinarySearchTreeNode<T> | undefined): void {
-    // create a stack
-    let stack = new Array<BinarySearchTreeNode<T>>();
-
-    // create array
-    let preOrderTraversalArray = new Array<T>();
-
-    // add the node to first item of the stack?
-    // let currentNode = this.root;
-    stack.push(node);
-
-    while (stack.length > 0) {
-      // 1. pop the node from the stack?
-      // node = stack.pop();
-
-      // 2. add the value into the preOrderTraversalArray
-      preOrderTraversalArray.push(node.data);
-
-      // 3. if node has right child, add to stack
-      if (node.rightNode !== null) {
-        stack.push(node.rightNode);
-      }
-
-      // 4. if node has left child, add to stack after adding the right node - Stack is First in Last Out
-      if (node.leftNode !== null) {
-        stack.push(node.leftNode);
-      }
-    }
-
     if (node) {
-      console.log(node.data);
+      console.log(node);
       this.preOrderTraversal(node.leftNode);
       this.preOrderTraversal(node.rightNode);
     }
-
-    // 5. return array
     return;
-    // return preOrderTraversalArray
   }
 
-  // left - right - root
   postOrderTraversal(node: BinarySearchTreeNode<T> | undefined): void {
-    let stack = new Array<BinarySearchTreeNode<T>>();
-    let postOrderTraversalArray = new Array<T>();
-    stack.push(node);
-
-    while (stack.length > 0) {
-      if (node.leftNode !== null) {
-        stack.push(node.leftNode);
-      }
-
-      if (node.rightNode !== null) {
-        stack.push(node.rightNode);
-      }
-
-      postOrderTraversalArray.push(node.data);
-    }
-
     if (node) {
       this.postOrderTraversal(node.leftNode);
       this.postOrderTraversal(node.rightNode);
       console.log(node.data);
     }
-
     return;
   }
 }
@@ -201,3 +226,43 @@ function comparator(a: number, b: number) {
 
   return 0;
 }
+
+let tree = new BinarySearchTree();
+tree.insert(8, 8);
+tree.insert(5, 5);
+tree.insert(3, 3);
+tree.insert(6, 6);
+tree.insert(9, 9);
+tree.insert(10, 10);
+
+// const inserts: number[] = [8, 5, 3, 6, 9, 10];
+// for (const i of inserts) {
+//   tree.root = tree.insert(tree.root, i);
+// }
+
+// console.log(tree);
+console.log('working tree', JSON.stringify(tree));
+
+// tree.insert(3, 3);
+// console.log("duplicate tree", JSON.stringify(tree));
+
+let testTree2 = new BinarySearchTree();
+// const inserts2: number[] = [10, 5, 15, -10, -5];
+// for (const i of inserts2) {
+//   testTree2.root = testTree2.insert(testTree2.root, i);
+// }
+testTree2.insert(10, 10);
+testTree2.insert(5, 5);
+testTree2.insert(-5, -5);
+testTree2.insert(15, 15);
+testTree2.insert(-10, -10);
+console.log(testTree2);
+console.log('tree2', JSON.stringify(testTree2));
+
+// console.log(tree.search(2));
+// console.log(tree.search(5));
+// console.log(tree.search(10));
+
+// tree.inOrderTraversal(tree.root);
+// tree.preOrderTraversal(tree.root);
+// tree.postOrderTraversal(tree.root);
