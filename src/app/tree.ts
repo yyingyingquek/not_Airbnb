@@ -10,26 +10,18 @@ export class BinarySearchTreeNode<T> {
   }
 
   get leftHeight(): number {
-    if (this.leftNode == null) {
+    if (!this.leftNode) {
       return 0;
     }
     return this.leftNode.height;
   }
 
   get rightHeight(): number {
-    if (this.rightNode == null) {
+    if (!this.rightNode) {
       return 0;
     }
     return this.rightNode.height;
   }
-
-  // getHeight(node: BinarySearchTreeNode<T>) {
-  //   return node == null ? -1 : node.height;
-  // }
-
-  // getHeight() {
-  //   return this.height - 1;
-  // }
 
   balanceFactor() {
     return this.leftHeight - this.rightHeight;
@@ -54,6 +46,8 @@ export class BinarySearchTree<T> {
     // if -1: more on right so do left rotate
     // if 0: do nothing
     // if 1: more on left so do right rotate
+    // console.log("key", key);
+    // console.log("node", node);
 
     const balanceFactorOfNode = node.balanceFactor();
 
@@ -102,93 +96,46 @@ export class BinarySearchTree<T> {
     return y;
   }
 
-  insert(data: T, key: T): BinarySearchTreeNode<T> | undefined {
-    const newNode = new BinarySearchTreeNode(data);
-    if (!this.root) {
-      this.root = newNode;
-      return newNode;
+  insert(
+    node: BinarySearchTreeNode<T>,
+    key: T
+  ): BinarySearchTreeNode<T> | undefined {
+    if (!node) {
+      return new BinarySearchTreeNode(key);
     }
 
-    if (this.root) {
-      let currentNode = this.root;
-      let searchingForPosition = true;
-      currentNode.updateHeight();
-
-      let searchForDuplicate = this.search(data);
-      if (searchForDuplicate) {
-        searchingForPosition = false;
-        throw new Error('data already exists');
-      }
-
-      while (searchingForPosition) {
-        if (currentNode.data > newNode.data) {
-          if (currentNode.leftNode == null) {
-            currentNode.leftNode = newNode;
-            currentNode.updateHeight();
-            searchingForPosition = false;
-            this.selfBalancingTree(currentNode, key);
-            return this.selfBalancingTree(newNode, key);
-          } else {
-            currentNode = currentNode.leftNode;
-            currentNode.updateHeight();
-            this.selfBalancingTree(currentNode, key);
-          }
-        } else if (currentNode.data < data) {
-          if (currentNode.rightNode == null) {
-            currentNode.rightNode = newNode;
-            currentNode.updateHeight();
-            searchingForPosition = false;
-            this.selfBalancingTree(currentNode, key);
-            return this.selfBalancingTree(newNode, key);
-          } else {
-            currentNode = currentNode.rightNode;
-            currentNode.updateHeight();
-            this.selfBalancingTree(currentNode, key);
-          }
-        }
-      }
+    let searchForDuplicate = this.search(node, key);
+    if (searchForDuplicate) {
+      throw new Error('node exists');
     }
 
-    // if (this.root == undefined || null) {
-    //   return new BinarySearchTreeNode(key);
-    // }
+    if (key < node.data) {
+      node.leftNode = this.insert(node.leftNode, key);
+    } else if (key > node.data) {
+      node.rightNode = this.insert(node.rightNode, key);
+    } else {
+      return node;
+    }
 
-    // if (key < data.data) {
-    //   data.leftNode = this.insert(data, key);
-    // } else if (key > data.data) {
-    //   data.rightNode = this.insert(data, key);
-    // } else {
-    //   return data;
-    // }
-    return this.selfBalancingTree(newNode, key);
+    node.updateHeight();
+    return this.selfBalancingTree(node, key);
   }
 
-  search(data: T): BinarySearchTreeNode<T> | undefined {
-    if (!this.root) {
-      return null;
+  search(
+    node: BinarySearchTreeNode<T>,
+    key: T
+  ): BinarySearchTreeNode<T> | boolean {
+    if (!node) {
+      return false;
     }
 
-    let currentNode = this.root;
-
-    while (currentNode) {
-      if (currentNode.data == data) {
-        return currentNode;
-      }
-
-      if (currentNode.data > data) {
-        if (!currentNode.leftNode) {
-          return;
-        }
-        currentNode = currentNode.leftNode;
-      } else {
-        if (!currentNode.rightNode) {
-          return;
-        }
-        currentNode = currentNode.rightNode;
-      }
+    if (key < node.data) {
+      return this.search(node.leftNode, key);
+    } else if (key > node.data) {
+      return this.search(node.rightNode, key);
+    } else {
+      return true;
     }
-
-    return currentNode;
   }
 
   inOrderTraversal(node: BinarySearchTreeNode<T> | undefined): void {
@@ -227,42 +174,16 @@ function comparator(a: number, b: number) {
   return 0;
 }
 
-let tree = new BinarySearchTree();
-tree.insert(8, 8);
-tree.insert(5, 5);
-tree.insert(3, 3);
-tree.insert(6, 6);
-tree.insert(9, 9);
-tree.insert(10, 10);
-
-// const inserts: number[] = [8, 5, 3, 6, 9, 10];
-// for (const i of inserts) {
-//   tree.root = tree.insert(tree.root, i);
-// }
-
-// console.log(tree);
-console.log('working tree', JSON.stringify(tree));
-
-// tree.insert(3, 3);
-// console.log("duplicate tree", JSON.stringify(tree));
-
 let testTree2 = new BinarySearchTree();
-// const inserts2: number[] = [10, 5, 15, -10, -5];
-// for (const i of inserts2) {
-//   testTree2.root = testTree2.insert(testTree2.root, i);
-// }
-testTree2.insert(10, 10);
-testTree2.insert(5, 5);
-testTree2.insert(-5, -5);
-testTree2.insert(15, 15);
-testTree2.insert(-10, -10);
-console.log(testTree2);
+const inserts2: number[] = [1, 2, 3, 4, 5];
+for (const i of inserts2) {
+  testTree2.root = testTree2.insert(testTree2.root, i);
+}
+
 console.log('tree2', JSON.stringify(testTree2));
+console.log('search', testTree2.search(testTree2.root, 5));
+console.log('search', testTree2.search(testTree2.root, 10));
 
-// console.log(tree.search(2));
-// console.log(tree.search(5));
-// console.log(tree.search(10));
-
-// tree.inOrderTraversal(tree.root);
-// tree.preOrderTraversal(tree.root);
-// tree.postOrderTraversal(tree.root);
+testTree2.inOrderTraversal(testTree2.root);
+testTree2.preOrderTraversal(testTree2.root);
+testTree2.postOrderTraversal(testTree2.root);
